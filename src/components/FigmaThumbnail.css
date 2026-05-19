@@ -1,0 +1,36 @@
+.figma-thumbnail {
+  position: relative;
+  width: 296px;
+  height: 304px;
+  margin: 0;
+  overflow: hidden;
+  background: #fff;
+}
+
+.figma-thumbnail__character {
+  position: absolute;
+  inset: 0;
+  width: 296px;
+  height: 304px;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.figma-thumbnail__pouch-wrap {
+  position: absolute;
+  left: 29px;
+  top: 152px;
+  display: flex;
+  width: 57.185px;
+  height: 54.099px;
+  align-items: center;
+  justify-content: center;
+}
+
+.figma-thumbnail__pouch {
+  width: 49.794px;
+  height: 45.964px;
+  transform: rotate(-10.26deg);
+  transform-origin: center;
+  pointer-events: none;
+}

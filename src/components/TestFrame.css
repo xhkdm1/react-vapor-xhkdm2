@@ -1,0 +1,27 @@
+.test-frame {
+  position: relative;
+  width: 611px;
+  height: 469px;
+  overflow: hidden;
+  background: #fff;
+  color: #000;
+  font-family:
+    Inter,
+    "Noto Sans KR",
+    "Apple SD Gothic Neo",
+    system-ui,
+    sans-serif;
+  letter-spacing: 0;
+}
+
+.test-frame__text {
+  position: absolute;
+  top: 201px;
+  left: 227px;
+  margin: 0;
+  color: #000;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: normal;
+  white-space: nowrap;
+}
