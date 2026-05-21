@@ -1,0 +1,913 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>문서 관리</title>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" />
+    <style>
+      :root {
+        --blue-50: #f7fbff;
+        --blue-100: #eaf6ff;
+        --blue-200: #d8edfc;
+        --blue-600: #4791ca;
+        --blue-700: #336b97;
+        --blue-800: #204867;
+        --blue-900: #1a3a52;
+        --gray-50: #f8f9fa;
+        --gray-100: #f1f3f5;
+        --gray-200: #e9ecef;
+        --gray-300: #dee2e6;
+        --gray-400: #ced4da;
+        --gray-500: #adb5bd;
+        --gray-600: #868e96;
+        --gray-700: #495057;
+        --gray-800: #343a40;
+        --green: #37b24d;
+        --green-bg: #ebfbee;
+        --amber: #e67700;
+        --amber-bg: #fff9db;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: #000;
+        background:
+          radial-gradient(circle at 80% 0%, rgba(255, 255, 255, 0.75), transparent 34%),
+          linear-gradient(90deg, #eef8ff 0%, #f8fcff 48%, #e4f4ff 100%);
+        font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      button,
+      input,
+      select {
+        font: inherit;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      .page {
+        display: flex;
+        min-height: 100vh;
+        padding: 32px 32px 32px 0;
+      }
+
+      .sidebar {
+        width: 288px;
+        min-width: 288px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding-top: 0;
+      }
+
+      .profile {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px;
+      }
+
+      .profile-left,
+      .nav-item,
+      .logout {
+        display: flex;
+        align-items: center;
+      }
+
+      .profile-left {
+        gap: 12px;
+        color: var(--gray-800);
+        font-size: 16px;
+        font-weight: 600;
+      }
+
+      .avatar,
+      .panel-toggle {
+        width: 26px;
+        height: 26px;
+        display: grid;
+        place-items: center;
+        color: var(--blue-800);
+      }
+
+      .nav {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        padding: 24px 16px;
+      }
+
+      .nav-item {
+        height: 48px;
+        gap: 4px;
+        padding: 12px 8px;
+        border: 1px solid transparent;
+        border-radius: 6px;
+        color: var(--blue-900);
+        font-size: 16px;
+        text-decoration: none;
+      }
+
+      .nav-item svg {
+        width: 26px;
+        height: 26px;
+        padding: 4px;
+        flex: 0 0 auto;
+      }
+
+      .nav-item.active {
+        color: var(--blue-700);
+        background: var(--blue-100);
+        border-color: var(--blue-600);
+      }
+
+      .logout-wrap {
+        padding: 24px 16px;
+      }
+
+      .logout {
+        width: 223px;
+        height: 48px;
+        justify-content: flex-start;
+        gap: 8px;
+        padding: 10px 8px;
+        border: 0;
+        border-radius: 6px;
+        color: var(--blue-800);
+        background: transparent;
+        font-size: 16px;
+      }
+
+      .logout svg {
+        width: 26px;
+        height: 26px;
+        padding: 5px;
+      }
+
+      .main {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        align-items: stretch;
+        padding-left: 8px;
+      }
+
+      .card {
+        width: 100%;
+        max-width: 1056px;
+        min-height: calc(100vh - 64px);
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        background: #fff;
+        border-radius: 32px;
+        box-shadow: 0 6px 10px rgba(51, 107, 151, 0.12);
+        padding: 48px 40px;
+      }
+
+      .header {
+        padding: 0 24px 24px;
+        border-bottom: 1px solid var(--gray-300);
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: 22px;
+        line-height: 28px;
+        font-weight: 500;
+      }
+
+      .subtitle {
+        margin: 0;
+        color: var(--gray-700);
+        font-size: 16px;
+        line-height: 24px;
+      }
+
+      .content {
+        flex: 1;
+        padding: 40px 32px 0;
+      }
+
+      .dropzone {
+        height: 182px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        border: 1px dashed var(--gray-400);
+        border-radius: 12px;
+        background: rgba(248, 249, 250, 0.3);
+        text-align: center;
+      }
+
+      .upload-icon {
+        width: 48px;
+        height: 48px;
+        display: grid;
+        place-items: center;
+        border-radius: 999px;
+        color: var(--gray-500);
+        background: #f3f4f6;
+      }
+
+      .dropzone strong {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 16px;
+        line-height: 24px;
+        font-weight: 400;
+      }
+
+      .dropzone span {
+        color: var(--gray-600);
+        font-size: 14px;
+        line-height: 20px;
+      }
+
+      .upload-card {
+        margin-top: 24px;
+        overflow: hidden;
+        border: 1px solid var(--gray-300);
+        border-radius: 16px;
+      }
+
+      .file-head {
+        min-height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 20px 16px;
+        background: rgba(230, 237, 242, 0.6);
+        border-bottom: 1px solid var(--gray-400);
+      }
+
+      .file-name {
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 16px;
+      }
+
+      .file-name span,
+      .doc-title {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .file-tile {
+        width: 20px;
+        height: 20px;
+        display: grid;
+        place-items: center;
+        flex: 0 0 auto;
+        color: var(--blue-700);
+        background: var(--blue-50);
+        border-radius: 4px;
+      }
+
+      .file-size {
+        flex: 0 0 auto;
+        color: var(--gray-700);
+        font-size: 14px;
+      }
+
+      .form {
+        padding: 24px;
+      }
+
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .field label {
+        height: 32px;
+        display: flex;
+        align-items: center;
+        color: #000;
+        font-size: 16px;
+        font-weight: 600;
+        line-height: 24px;
+      }
+
+      .input-shell,
+      .select-shell {
+        height: 40px;
+        display: flex;
+        align-items: center;
+        border: 1px solid var(--blue-600);
+        border-radius: 8px;
+        background: #fff;
+      }
+
+      .input-shell {
+        padding: 0 12px;
+      }
+
+      .input-shell input {
+        width: 100%;
+        min-width: 0;
+        border: 0;
+        outline: 0;
+        color: #000;
+        font-size: 14px;
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+        margin-top: 24px;
+      }
+
+      .segmented {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .segment {
+        height: 40px;
+        border: 1px solid var(--gray-300);
+        border-radius: 6px;
+        color: var(--gray-600);
+        background: #fff;
+        font-size: 14px;
+      }
+
+      .segment:hover,
+      .icon-button:hover,
+      .logout:hover {
+        background: var(--gray-50);
+      }
+
+      .select-shell {
+        border-color: var(--gray-300);
+        padding: 0 12px;
+      }
+
+      .select-shell select {
+        width: 100%;
+        min-width: 0;
+        border: 0;
+        outline: 0;
+        color: var(--gray-500);
+        background: transparent;
+        appearance: none;
+        font-size: 14px;
+      }
+
+      .select-shell svg {
+        color: var(--gray-500);
+        flex: 0 0 auto;
+      }
+
+      .actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 16px;
+        margin-top: 34px;
+      }
+
+      .action {
+        width: 146px;
+        height: 40px;
+        border: 1px solid var(--gray-300);
+        border-radius: 6px;
+        color: var(--gray-700);
+        background: #fff;
+      }
+
+      .action.primary {
+        border-color: var(--gray-200);
+        color: var(--gray-500);
+        background: var(--gray-200);
+      }
+
+      .list {
+        margin-top: 12px;
+        padding-top: 24px;
+        border-top: 1px solid var(--gray-300);
+      }
+
+      .list-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 10px;
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .count {
+        padding: 2px 8px;
+        border-radius: 999px;
+        color: var(--gray-500);
+        background: var(--gray-50);
+        font-size: 12px;
+        font-weight: 400;
+        line-height: 18px;
+      }
+
+      .table {
+        width: 100%;
+      }
+
+      .table-row {
+        display: grid;
+        grid-template-columns: minmax(220px, 1.7fr) 100px 100px 100px 40px;
+        align-items: center;
+        gap: 60px;
+        min-height: 57px;
+        padding: 0 4px;
+        border-bottom: 1px solid var(--gray-100);
+        border-radius: 8px;
+      }
+
+      .table-row.head {
+        min-height: 31px;
+        color: var(--gray-600);
+        font-size: 12px;
+        border-bottom: 0;
+      }
+
+      .doc-cell {
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .doc-cell svg {
+        width: 20px;
+        height: 20px;
+        flex: 0 0 auto;
+        color: var(--blue-700);
+      }
+
+      .doc-title,
+      .meta {
+        color: var(--gray-700);
+        font-size: 14px;
+        line-height: 20px;
+      }
+
+      .doc-title {
+        color: #000;
+      }
+
+      .badge {
+        width: fit-content;
+        display: inline-flex;
+        align-items: center;
+        gap: 2px;
+        padding: 4px 12px 4px 8px;
+        border-radius: 16px;
+        font-size: 12px;
+        line-height: 16px;
+      }
+
+      .badge::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        margin: 0 5px;
+        border-radius: 50%;
+        background: currentColor;
+      }
+
+      .badge.done {
+        color: var(--green);
+        background: var(--green-bg);
+      }
+
+      .badge.pending {
+        color: var(--amber);
+        background: var(--amber-bg);
+      }
+
+      .icon-button {
+        width: 28px;
+        height: 28px;
+        display: grid;
+        place-items: center;
+        border: 0;
+        border-radius: 6px;
+        color: var(--gray-500);
+        background: transparent;
+      }
+
+      .pagination {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding-top: 78px;
+      }
+
+      .page-btn,
+      .page-num {
+        width: 28px;
+        height: 28px;
+        display: grid;
+        place-items: center;
+        border: 0;
+        border-radius: 6px;
+        color: var(--blue-800);
+        background: #fff;
+        font-size: 16px;
+      }
+
+      .page-btn {
+        width: 26px;
+        height: 26px;
+        color: var(--blue-700);
+      }
+
+      .page-btn:disabled {
+        color: var(--gray-300);
+        cursor: default;
+      }
+
+      .page-num.active {
+        color: #fff;
+        background: var(--blue-700);
+      }
+
+      svg {
+        display: block;
+      }
+
+      @media (max-width: 1040px) {
+        .page {
+          padding: 20px;
+        }
+
+        .sidebar {
+          width: 220px;
+          min-width: 220px;
+        }
+
+        .card {
+          padding: 36px 28px;
+        }
+
+        .content {
+          padding-inline: 18px;
+        }
+
+        .table-row {
+          grid-template-columns: minmax(180px, 1.6fr) 96px 80px 90px 32px;
+          gap: 24px;
+        }
+      }
+
+      @media (max-width: 760px) {
+        .page {
+          display: block;
+          padding: 0;
+        }
+
+        .sidebar {
+          width: 100%;
+          min-width: 0;
+          display: block;
+          padding: 12px;
+          background: rgba(255, 255, 255, 0.78);
+          border-bottom: 1px solid var(--gray-200);
+        }
+
+        .profile,
+        .logout-wrap {
+          display: none;
+        }
+
+        .nav {
+          flex-direction: row;
+          padding: 0;
+        }
+
+        .nav-item {
+          flex: 1;
+          justify-content: center;
+        }
+
+        .main {
+          padding: 16px;
+        }
+
+        .card {
+          min-height: auto;
+          padding: 28px 18px;
+          border-radius: 24px;
+        }
+
+        .header,
+        .content {
+          padding-inline: 8px;
+        }
+
+        .file-head,
+        .form-row,
+        .actions {
+          display: grid;
+          grid-template-columns: 1fr;
+        }
+
+        .form-row {
+          gap: 18px;
+        }
+
+        .actions {
+          gap: 10px;
+        }
+
+        .action {
+          width: 100%;
+        }
+
+        .table {
+          overflow-x: auto;
+        }
+
+        .table-row {
+          min-width: 760px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <aside class="sidebar" aria-label="관리자 메뉴">
+        <div>
+          <div class="profile">
+            <div class="profile-left">
+              <span class="avatar" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <circle cx="12" cy="8" r="4"></circle>
+                  <path d="M4.5 21a7.5 7.5 0 0 1 15 0"></path>
+                </svg>
+              </span>
+              <span>관리자</span>
+            </div>
+            <span class="panel-toggle" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <rect x="4" y="5" width="16" height="14" rx="2"></rect>
+                <path d="M9 5v14"></path>
+              </svg>
+            </span>
+          </div>
+
+          <nav class="nav">
+            <a class="nav-item" href="#">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9.5" cy="7" r="4"></circle>
+                <path d="M19 8v6"></path>
+                <path d="M22 11h-6"></path>
+              </svg>
+              <span>계정 관리</span>
+            </a>
+            <a class="nav-item active" href="#" aria-current="page">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"></path>
+                <path d="M14 2v5h5"></path>
+                <path d="M9 13h6"></path>
+                <path d="M9 17h4"></path>
+              </svg>
+              <span>문서 관리</span>
+            </a>
+          </nav>
+        </div>
+
+        <div class="logout-wrap">
+          <button class="logout" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <path d="M16 17l5-5-5-5"></path>
+              <path d="M21 12H9"></path>
+            </svg>
+            <span>로그아웃</span>
+          </button>
+        </div>
+      </aside>
+
+      <main class="main">
+        <section class="card" aria-labelledby="page-title">
+          <header class="header">
+            <h1 id="page-title">문서 관리</h1>
+            <p class="subtitle">신입 사원 온보딩에 필요한 문서를 등록하고 관리해요</p>
+          </header>
+
+          <div class="content">
+            <section class="dropzone" aria-label="문서 업로드">
+              <div class="upload-icon" aria-hidden="true">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <path d="M17 8l-5-5-5 5"></path>
+                  <path d="M12 3v12"></path>
+                </svg>
+              </div>
+              <div>
+                <strong>파일을 끌어다 놓거나 클릭해서 업로드하세요</strong>
+                <span>PDF, DOCX 등</span>
+              </div>
+            </section>
+
+            <section class="upload-card" aria-label="업로드 문서 정보">
+              <div class="file-head">
+                <div class="file-name">
+                  <span class="file-tile" aria-hidden="true">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                      <path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"></path>
+                      <path d="M14 2v5h5"></path>
+                    </svg>
+                  </span>
+                  <span>2026년_신입사원_온보딩_프로세스_및_복지카드_신청_절차_안내문서.pdf</span>
+                </div>
+                <span class="file-size">390 KB</span>
+              </div>
+
+              <div class="form">
+                <div class="field">
+                  <label for="doc-title">제목</label>
+                  <div class="input-shell">
+                    <input id="doc-title" value="2026년_신입사원_온보딩_프로세스_및_복지카드_신청_절차_안내문서.pdf" />
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="field">
+                    <label>문서 타입</label>
+                    <div class="segmented" role="group" aria-label="문서 타입">
+                      <button class="segment" type="button">LEGAL</button>
+                      <button class="segment" type="button">GUIDE</button>
+                      <button class="segment" type="button">TEMPLATE</button>
+                    </div>
+                  </div>
+
+                  <div class="field">
+                    <label for="department">담당 부서</label>
+                    <div class="select-shell">
+                      <select id="department">
+                        <option selected>부서를 선택해주세요</option>
+                        <option>개발팀</option>
+                        <option>경영지원팀</option>
+                        <option>프로덕트팀</option>
+                        <option>마케팅팀</option>
+                      </select>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                        <path d="m6 9 6 6 6-6"></path>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="actions">
+                  <button class="action" type="button">취소</button>
+                  <button class="action primary" type="button">업로드</button>
+                </div>
+              </div>
+            </section>
+
+            <section class="list" aria-labelledby="list-title">
+              <h2 class="list-title" id="list-title">등록한 문서 목록 <span class="count">총 4개</span></h2>
+              <div class="table" role="table" aria-label="등록한 문서 목록">
+                <div class="table-row head" role="row">
+                  <span role="columnheader">문서명</span>
+                  <span role="columnheader">상태</span>
+                  <span role="columnheader">문서 타입</span>
+                  <span role="columnheader">담당 부서</span>
+                  <span role="columnheader"></span>
+                </div>
+
+                <div class="table-row" role="row">
+                  <div class="doc-cell" role="cell">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                      <path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"></path>
+                      <path d="M14 2v5h5"></path>
+                    </svg>
+                    <span class="doc-title">테크 주식회사 행정 및 오피스 라이프 안내.pdf</span>
+                  </div>
+                  <span class="badge done" role="cell">등록 완료</span>
+                  <span class="meta" role="cell">LEGAL</span>
+                  <span class="meta" role="cell">개발팀</span>
+                  <button class="icon-button" type="button" aria-label="문서 삭제">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                      <path d="M3 6h18"></path>
+                      <path d="M8 6V4h8v2"></path>
+                      <path d="M19 6l-1 14H6L5 6"></path>
+                      <path d="M10 11v5"></path>
+                      <path d="M14 11v5"></path>
+                    </svg>
+                  </button>
+                </div>
+
+                <div class="table-row" role="row">
+                  <div class="doc-cell" role="cell">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                      <path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"></path>
+                      <path d="M14 2v5h5"></path>
+                    </svg>
+                    <span class="doc-title">테크 주식회사 행정 및 오피스 라이프 안내.pdf</span>
+                  </div>
+                  <span class="badge done" role="cell">등록 완료</span>
+                  <span class="meta" role="cell">GUIDE</span>
+                  <span class="meta" role="cell">경영지원팀</span>
+                  <button class="icon-button" type="button" aria-label="문서 삭제">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                      <path d="M3 6h18"></path>
+                      <path d="M8 6V4h8v2"></path>
+                      <path d="M19 6l-1 14H6L5 6"></path>
+                      <path d="M10 11v5"></path>
+                      <path d="M14 11v5"></path>
+                    </svg>
+                  </button>
+                </div>
+
+                <div class="table-row" role="row">
+                  <div class="doc-cell" role="cell">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                      <path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"></path>
+                      <path d="M14 2v5h5"></path>
+                    </svg>
+                    <span class="doc-title">테크 주식회사 행정 및 오피스 라이프 안내.pdf</span>
+                  </div>
+                  <span class="badge pending" role="cell">처리중</span>
+                  <span class="meta" role="cell">TEMPLATE</span>
+                  <span class="meta" role="cell">프로덕트팀</span>
+                  <button class="icon-button" type="button" aria-label="문서 삭제">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                      <path d="M3 6h18"></path>
+                      <path d="M8 6V4h8v2"></path>
+                      <path d="M19 6l-1 14H6L5 6"></path>
+                      <path d="M10 11v5"></path>
+                      <path d="M14 11v5"></path>
+                    </svg>
+                  </button>
+                </div>
+
+                <div class="table-row" role="row">
+                  <div class="doc-cell" role="cell">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                      <path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"></path>
+                      <path d="M14 2v5h5"></path>
+                    </svg>
+                    <span class="doc-title">테크 주식회사 행정 및 오피스 라이프 안내.pdf</span>
+                  </div>
+                  <span class="badge done" role="cell">등록 완료</span>
+                  <span class="meta" role="cell">GUIDE</span>
+                  <span class="meta" role="cell">마케팅팀</span>
+                  <button class="icon-button" type="button" aria-label="문서 삭제">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                      <path d="M3 6h18"></path>
+                      <path d="M8 6V4h8v2"></path>
+                      <path d="M19 6l-1 14H6L5 6"></path>
+                      <path d="M10 11v5"></path>
+                      <path d="M14 11v5"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            <nav class="pagination" aria-label="페이지네이션">
+              <button class="page-btn" type="button" disabled aria-label="이전 페이지">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="m15 18-6-6 6-6"></path>
+                </svg>
+              </button>
+              <button class="page-num active" type="button" aria-current="page">1</button>
+              <button class="page-num" type="button">2</button>
+              <button class="page-num" type="button">3</button>
+              <button class="page-num" type="button">4</button>
+              <button class="page-num" type="button">5</button>
+              <button class="page-num" type="button">...</button>
+              <button class="page-num" type="button">15</button>
+              <button class="page-btn" type="button" aria-label="다음 페이지">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="m9 18 6-6-6-6"></path>
+                </svg>
+              </button>
+            </nav>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
